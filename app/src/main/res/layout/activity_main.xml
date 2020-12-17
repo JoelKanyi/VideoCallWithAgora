@@ -5,55 +5,78 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+<RelativeLayout
+    android:id="@+id/remote_video_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/remoteBackground">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
-        android:background="#eeeeee"
-        android:orientation="vertical">
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/icon_agora_largest"
+        android:scaleType="centerCrop"
+        android:layout_centerInParent="true"
+        tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/quick_tips_when_use_agora_sdk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_marginStart="16dp"
-            android:gravity="center_vertical|start"
-            android:text="1. Default channel name is voiceDemoChannel1\n2. Waiting for remote users\n3. This demo only supports 1v1 voice calling" />
+</RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+<FrameLayout
+    android:layout_width="100dp"
+    android:layout_height="150dp"
+    android:layout_alignParentEnd="true"
+    android:layout_marginEnd="24dp"
+    android:layout_marginTop="24dp"
+    android:background="@color/localBackground"
+    android:id="@+id/local_video_view">
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20"
-                android:onClick="onLocalAudioMuteClicked"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_mute_microphone" />
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/icon_agora_large"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center"/>
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20"
-                android:onClick="onSwitchSpeakerphoneClicked"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_volume" />
+</FrameLayout>
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20"
-                android:onClick="onEncCallClicked"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_phone_call_end" />
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="30dp"
+    android:id="@+id/control_panel"
+    android:layout_alignParentBottom="true">
 
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/btn_end_call"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/btn_endcall_normal"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/btn_mute"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/btn_unmute_normal"
+            android:layout_toStartOf="@id/btn_end_call"
+            android:layout_marginEnd="30dp"
+            android:layout_centerVertical="true"
+            tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/switch_camera"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="30dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/btn_switch_camera_normal"
+            android:layout_toEndOf="@id/btn_end_call"
+            android:layout_centerVertical="true"
+            tools:ignore="ContentDescription" />
 
-    </LinearLayout>
+
+</RelativeLayout>
 
 </RelativeLayout>
