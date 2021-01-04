@@ -15,11 +15,11 @@ import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
 import io.agora.rtc.video.VideoCanvas
 import io.agora.rtc.video.VideoEncoderConfiguration
+import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val LOG_TAG = "MainActivity"
     private val PERMISSION_REQ_ID_RECORD_AUDIO = 22
     private val PERMISSION_REQ_ID_CAMERA = 22
     private lateinit var mMuteBtn: ImageView
@@ -76,10 +76,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Timber.d("About to start everything")
+
         initUI()
 
         // If all the permissions are granted, initialize the RtcEngine object and join a channel.
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO) && checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA)) {
+
+            Timber.d("Requested permission are ok")
             initAgoraEngineAndJoinChannel()
         }
 
@@ -91,16 +95,50 @@ class MainActivity : AppCompatActivity() {
         mCallBtn = findViewById(R.id.btn_call)
         mMuteBtn = findViewById(R.id.btn_mute)
         mSwitchCameraBtn = findViewById(R.id.btn_switch_camera)
+
+        Timber.d("the UI has been initialized")
     }
 
     private fun initAgoraEngineAndJoinChannel() {
 
         // This is our usual steps for joining
         // a channel and starting a call.
+
+        Timber.d("about to initialize and join a channel")
         initializeAgoraEngine()
-        setupVideoConfig()
         setupLocalVideo()
+        setupVideoConfig()
         joinChannel()
+
+    }
+
+    private fun initializeAgoraEngine() {
+        try {
+            mRtcEngine = RtcEngine.create(baseContext, getString(R.string.agora_app_id), mRtcEventHandler)
+            Timber.d("Successfully initialized the the agora engine")
+        } catch (e: Exception) {
+            Timber.d(e)
+            throw RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e))
+        }
+    }
+
+    private fun setupLocalVideo() {
+        Timber.d(".................Setting up local video view........................")
+
+        // Enable the video module.
+        mRtcEngine!!.enableVideo()
+        Timber.d("Enable the video module")
+
+        val container = findViewById<FrameLayout>(R.id.local_video_view)
+
+        // Create a SurfaceView object.
+        val surfaceView = RtcEngine.CreateRendererView(baseContext)
+        surfaceView.setZOrderMediaOverlay(true)
+        container.addView(surfaceView)
+
+        // Set the local video view.
+        mRtcEngine!!.setupLocalVideo(VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_FIT, 0))
+        Timber.d("Set the local video view")
     }
 
     private fun joinChannel() {
@@ -124,35 +162,14 @@ class MainActivity : AppCompatActivity() {
                 VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT))
     }
 
-    private fun setupLocalVideo() {
-        // Enable the video module.
-        mRtcEngine!!.enableVideo()
 
-        val container = findViewById<FrameLayout>(R.id.local_video_view)
 
-        // Create a SurfaceView object.
-        val surfaceView = RtcEngine.CreateRendererView(baseContext)
-        surfaceView.setZOrderMediaOverlay(true)
-        container.addView(surfaceView)
-        // Set the local video view.
-        mRtcEngine!!.setupLocalVideo(VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-    }
 
-    private fun initializeAgoraEngine() {
-        try {
-            mRtcEngine = RtcEngine.create(baseContext, getString(R.string.agora_app_id), mRtcEventHandler)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, Log.getStackTraceString(e))
-
-            throw RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e))
-        }
-    }
 
     /**
      * Call the checkSelfPermission method to access the camera and the microphone of the Android device when launching the activity
      */
     private fun checkSelfPermission(permission: String, requestCode: Int): Boolean {
-        Log.i(LOG_TAG, "checkSelfPermission $permission $requestCode")
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
