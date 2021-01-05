@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.SurfaceView
 import android.view.View
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -68,13 +69,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupRemoteVideo(uid: Int) {
 
-        if (mRemoteContainer.childCount >= 1) {
+        Timber.d("Child count${mRemoteContainer.childCount}")
+        if (mRemoteContainer.childCount > 1) {
             return
-        }else{
+        }
             mRemoteView = RtcEngine.CreateRendererView(baseContext)
             mRemoteContainer.addView(mRemoteView)
-            mRtcEngine.setupRemoteVideo(VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid))
-        }
+            mRtcEngine.setupRemoteVideo(VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_FILL, uid))
     }
 
     private fun onRemoteUserLeft() {
@@ -135,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             }
             // Here we continue only if all permissions are granted.
             // The permissions can also be granted in the system settings manually.
-            initAgoraEngineAndJoinChannel();
+            initAgoraEngineAndJoinChannel()
         }
     }
 
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         Timber.d(".................Setting up local video view........................")
 
         mLocalView = RtcEngine.CreateRendererView(baseContext)
-       // mLocalView.setZOrderMediaOverlay(true)
+        mLocalView!!.setZOrderMediaOverlay(true)
         mLocalContainer.addView(mLocalView)
 
         // Set the local video view.
@@ -206,12 +207,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onLocalAudioMuteClicked(view: View) {
-        mMuted = true
+        mMuted = !mMuted
         mRtcEngine.muteLocalAudioStream(mMuted)
         val res: Int = if (mMuted){
-            R.drawable.btn_mute_pressed
+            R.drawable.btn_mute_normal
         }
-        else R.drawable.btn_unmute_pressed
+        else R.drawable.btn_unmute_normal
 
         mMuteBtn.setImageResource(res)
     }
@@ -226,12 +227,15 @@ class MainActivity : AppCompatActivity() {
             startCall()
             mCallEnd = false
             mCallBtn.setImageResource(R.drawable.btn_endcall_pressed)
+            mMuteBtn.visibility = VISIBLE
+            mSwitchCameraBtn.visibility = VISIBLE
         }else{
             endCall()
             mCallEnd = true
             mCallBtn.setImageResource(R.drawable.btn_startcall_normal)
+            mMuteBtn.visibility = INVISIBLE
+            mSwitchCameraBtn.visibility = INVISIBLE
         }
-        showButtons(!mCallEnd)
     }
 
     private fun endCall(){
@@ -250,11 +254,6 @@ class MainActivity : AppCompatActivity() {
     private fun startCall(){
         setupLocalVideo()
         joinChannel()
-    }
-
-    private fun showButtons(boolean: Boolean){
-        mMuteBtn.visibility = VISIBLE
-        mSwitchCameraBtn.visibility = VISIBLE
     }
 
     override fun onDestroy() {

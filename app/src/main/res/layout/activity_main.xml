@@ -16,7 +16,7 @@
         android:layout_height="70dp"
         android:src="@drawable/icon_agora_largest"
         android:scaleType="centerCrop"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         tools:ignore="ContentDescription" />
 
 </RelativeLayout>
@@ -35,7 +35,8 @@
         android:layout_height="40dp"
         android:src="@drawable/icon_agora_large"
         android:scaleType="centerCrop"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        tools:ignore="ContentDescription" />
 
 </FrameLayout>
 
