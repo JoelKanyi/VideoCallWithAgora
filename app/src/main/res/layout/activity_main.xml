@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-<FrameLayout
+<RelativeLayout
     android:id="@+id/remote_video_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         tools:ignore="ContentDescription" />
 
-</FrameLayout>
+</RelativeLayout>
 
 <FrameLayout
     android:layout_width="100dp"
@@ -51,6 +51,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="centerCrop"
+            android:onClick="onCallClicked"
             android:src="@drawable/btn_endcall_normal"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
