@@ -21,28 +21,35 @@ import io.agora.rtc.video.VideoCanvas
 import io.agora.rtc.video.VideoEncoderConfiguration
 import timber.log.Timber
 
-
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSION_REQ_ID = 22
 
-    private val REQUESTED_PERMISSIONS = arrayOf(
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_PHONE_STATE
-    )
+    // Ask for Android device permissions at runtime.
+    private val REQUESTED_PERMISSIONS = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.READ_PHONE_STATE)
 
-
-    private lateinit var mRtcEngine: RtcEngine
     private var mCallEnd = false
     private var mMuted = false
     private lateinit var mLocalContainer: FrameLayout
     private lateinit var mRemoteContainer: RelativeLayout
-    private  var mRemoteView: SurfaceView? = null
-    private var mLocalView: SurfaceView?  = null
+    private var mRemoteView: SurfaceView? = null
+    private var mLocalView: SurfaceView? = null
     private lateinit var mCallBtn: ImageView
     private lateinit var mMuteBtn: ImageView
     private lateinit var mSwitchCameraBtn: ImageView
+    private lateinit var mRtcEngine: RtcEngine
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        initUI()
+
+        // If all the permissions are granted, initialize the RtcEngine object and join a channel.
+        if (checkSelfPermission(REQUESTED_PERMISSIONS[0], PERMISSION_REQ_ID) && checkSelfPermission(REQUESTED_PERMISSIONS[1], PERMISSION_REQ_ID) && checkSelfPermission(REQUESTED_PERMISSIONS[2], PERMISSION_REQ_ID)) {
+            initAgoraEngineAndJoinChannel()
+        }
+    }
 
     private val mRtcEventHandler = object : IRtcEngineEventHandler() {
 
@@ -52,54 +59,27 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Joined Channel Successfully", Toast.LENGTH_SHORT).show()
             }
         }
-
+        /*
+         * Listen for the onFirstRemoteVideoDecoded callback.
+         * This callback occurs when the first video frame of a remote user is received and decoded after the remote user successfully joins the channel.
+         * You can call the setupRemoteVideo method in this callback to set up the remote video view.
+         */
         override fun onFirstRemoteVideoDecoded(uid: Int, width: Int, height: Int, elapsed: Int) {
             runOnUiThread {
                 Timber.d("first remote video decoded")
-                setupRemoteVideo(uid) }
+                setupRemoteVideo(uid)
+            }
         }
-
+        /*
+        * Listen for the onUserOffline callback.
+        * This callback occurs when the remote user leaves the channel or drops offline.
+        */
         override fun onUserOffline(uid: Int, reason: Int) {
             runOnUiThread {
                 Timber.d("user offline")
                 onRemoteUserLeft()
             }
         }
-    }
-
-    private fun setupRemoteVideo(uid: Int) {
-
-        Timber.d("Child count${mRemoteContainer.childCount}")
-        if (mRemoteContainer.childCount > 1) {
-            return
-        }
-            mRemoteView = RtcEngine.CreateRendererView(baseContext)
-            mRemoteContainer.addView(mRemoteView)
-            mRtcEngine.setupRemoteVideo(VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_FILL, uid))
-    }
-
-    private fun onRemoteUserLeft() {
-        removeRemoteVideo()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        Timber.d("About to start everything")
-
-        initUI()
-
-        // If all the permissions are granted, initialize the RtcEngine object and join a channel.
-        if (
-                checkSelfPermission(REQUESTED_PERMISSIONS[0], PERMISSION_REQ_ID) &&
-                checkSelfPermission(REQUESTED_PERMISSIONS[1], PERMISSION_REQ_ID) &&
-                checkSelfPermission(REQUESTED_PERMISSIONS[2], PERMISSION_REQ_ID)) {
-
-            Timber.d("Requested permission are ok")
-            initAgoraEngineAndJoinChannel()
-        }
-
     }
 
     private fun initUI() {
@@ -123,11 +103,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
-        if (requestCode == PERMISSION_REQ_ID){
+        if (requestCode == PERMISSION_REQ_ID) {
             if (
                     grantResults[0] != PackageManager.PERMISSION_GRANTED ||
                     grantResults[1] != PackageManager.PERMISSION_GRANTED ||
-                    grantResults[2] != PackageManager.PERMISSION_GRANTED){
+                    grantResults[2] != PackageManager.PERMISSION_GRANTED) {
 
                 Timber.d("Failed")
                 Toast.makeText(applicationContext, "Need permissions ${Manifest.permission.RECORD_AUDIO}  ${Manifest.permission.CAMERA}  ${Manifest.permission.WRITE_EXTERNAL_STORAGE} ${Manifest.permission.READ_PHONE_STATE}", Toast.LENGTH_LONG).show()
@@ -141,15 +121,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initAgoraEngineAndJoinChannel() {
+
         // This is our usual steps for joining
         // a channel and starting a call.
-        Timber.d("about to initialize and join a channel")
         initializeAgoraEngine()
         setupVideoConfig()
         setupLocalVideo()
         joinChannel()
     }
 
+    // Initialize the RtcEngine object.
     private fun initializeAgoraEngine() {
         try {
             mRtcEngine = RtcEngine.create(baseContext, getString(R.string.agora_app_id), mRtcEventHandler)
@@ -172,14 +153,21 @@ class MainActivity : AppCompatActivity() {
         Timber.d("Set the local video view")
     }
 
+    private fun setupRemoteVideo(uid: Int) {
+
+        Timber.d("Child count${mRemoteContainer.childCount}")
+        if (mRemoteContainer.childCount > 1) {
+            return
+        }
+        mRemoteView = RtcEngine.CreateRendererView(baseContext)
+        mRemoteContainer.addView(mRemoteView)
+        mRtcEngine.setupRemoteVideo(VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_FILL, uid))
+    }
+
     private fun setupVideoConfig() {
-        // In simple use cases, we only need to enable video capturing
-        // and rendering once at the initialization step.
-        // Note: audio recording and playing is enabled by default.
+
         mRtcEngine.enableVideo()
 
-        // Please go to this page for detailed explanation
-        // https://docs.agora.io/en/Video/API%20Reference/java/classio_1_1agora_1_1rtc_1_1_rtc_engine.html#af5f4de754e2c1f493096641c5c5c1d8f
         mRtcEngine.setVideoEncoderConfiguration(VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
                 VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15,
@@ -188,28 +176,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun joinChannel() {
+
         val token = getString(R.string.access_token)
 
         // Join a channel with a token.
         mRtcEngine.joinChannel(token, "demoChannel1", "Extra Optional Data", 0)
     }
 
-    private fun removeRemoteVideo() {
-        if (mRemoteView != null) {
-            mRemoteContainer.removeView(mRemoteView)
-        }
-       mRemoteView = null
-    }
-
-    private fun leaveChannel() {
-        // Leave the current channel.
-        mRtcEngine.leaveChannel()
-    }
-
     fun onLocalAudioMuteClicked(view: View) {
         mMuted = !mMuted
         mRtcEngine.muteLocalAudioStream(mMuted)
-        val res: Int = if (mMuted){
+        val res: Int = if (mMuted) {
             R.drawable.btn_mute_normal
         }
         else R.drawable.btn_unmute_normal
@@ -222,14 +199,14 @@ class MainActivity : AppCompatActivity() {
         Timber.d("Switched the camera")
     }
 
-    fun onCallClicked(view: View){
-        if (mCallEnd){
+    fun onCallClicked(view: View) {
+        if (mCallEnd) {
             startCall()
             mCallEnd = false
-            mCallBtn.setImageResource(R.drawable.btn_endcall_pressed)
+            mCallBtn.setImageResource(R.drawable.btn_endcall_normal)
             mMuteBtn.visibility = VISIBLE
             mSwitchCameraBtn.visibility = VISIBLE
-        }else{
+        } else {
             endCall()
             mCallEnd = true
             mCallBtn.setImageResource(R.drawable.btn_startcall_normal)
@@ -238,27 +215,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun endCall(){
+    private fun startCall() {
+        setupLocalVideo()
+        joinChannel()
+    }
+
+    private fun endCall() {
         removeLocalVideo()
         removeRemoteVideo()
         leaveChannel()
     }
 
     private fun removeLocalVideo() {
-        if (mLocalView != null){
+        if (mLocalView != null) {
             mLocalContainer.removeView(mLocalView)
         }
         mLocalView = null
     }
 
-    private fun startCall(){
-        setupLocalVideo()
-        joinChannel()
+    private fun removeRemoteVideo() {
+        if (mRemoteView != null) {
+            mRemoteContainer.removeView(mRemoteView)
+        }
+        mRemoteView = null
+    }
+
+    private fun leaveChannel() {
+        // Leave the current channel.
+        mRtcEngine.leaveChannel()
+    }
+
+    private fun onRemoteUserLeft() {
+        removeRemoteVideo()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!mCallEnd){
+        if (!mCallEnd) {
             leaveChannel()
         }
         RtcEngine.destroy()
