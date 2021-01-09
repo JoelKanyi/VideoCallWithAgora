@@ -1,6 +1,6 @@
 # VideoCallWithAgora
 
-a basic video call with the Agora Video SDK for Android.
+a basic one-to-one video call with the Agora Video SDK for Android <a href="https://docs.agora.io/en/Video/start_call_android?platform=Android">Video Call</a>.
 
 ## Demo
 
