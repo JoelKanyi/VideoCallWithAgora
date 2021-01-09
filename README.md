@@ -173,4 +173,3 @@ Please feel free to contact me if you have any questions, ideas or even if you j
 ## References
 
 - https://docs.agora.io/en/Video/start_call_android?platform=Android#import_class
-- 
