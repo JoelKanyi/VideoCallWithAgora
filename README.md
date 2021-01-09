@@ -2,6 +2,15 @@
 
 a basic video call with the Agora Video SDK for Android.
 
+## Demo
+
+<p float="left">
+<img src="screenshots/Screenshot_20210109-151131.png" width=250/>
+<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
+<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
+<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
+  </p>
+
 ## Setup Requirements
 - Android Studio 3.0 or later
 - Android SDK API Level 16 or higher
@@ -147,13 +156,6 @@ In order to get the app running yourself, you need to:
 2.  Import the project into Android Studio
 3.  Connect the android device with USB or just use your emulator
 4.  In Android Studio, click on the "Run" button.
-
-## Demo
-
-<p float="left">
-<img src="screenshots/Screenshot_20201225-114110.png" width=250/>
-<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
-  </p>
 
 ## Support
 
