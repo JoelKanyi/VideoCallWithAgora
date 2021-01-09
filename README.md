@@ -6,9 +6,8 @@ a basic video call with the Agora Video SDK for Android.
 
 <p float="left">
 <img src="screenshots/Screenshot_20210109-151131.png" width=250/>
-<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
-<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
-<img src="screenshots/Screenshot_20201225-114141.png" width=250/>
+<img src="screenshots/IMG-20210109-WA0006.png" width=250/>
+<img src="screenshots/Screenshot_20210109-150612.png" width=250/>
   </p>
 
 ## Setup Requirements
